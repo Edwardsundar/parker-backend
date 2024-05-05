@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Define the file appender -->
+    <appender name="FILE-AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Set the file where logs will be written -->
+        <file>/home/dharrun/AndroidStudioProjects/SpringParkapplog/audit.log</file>
+
+        <!-- Define the policy for rolling log files -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- Daily rollover with max history of 30 days -->
+            <fileNamePattern>/home/dharrun/AndroidStudioProjects/SpringParkapplog/audit.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <!-- Define the layout of log messages -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{0} - %X{username} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Define a logger for user activities -->
+    <logger name="com.app.parker.module.UserActivityLogger" level="INFO" additivity="false">
+        <appender-ref ref="FILE-AUDIT"/>
+    </logger>
+
+    <!-- Root logger configuration -->
+    <root level="error">
+        <appender-ref ref="FILE-AUDIT" />
+    </root>
+
+</configuration>

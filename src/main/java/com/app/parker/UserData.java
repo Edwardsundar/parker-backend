@@ -1,8 +1,7 @@
 package com.app.parker;
 
 import com.app.parker.module.Data;
-import org.springframework.boot.autoconfigure.gson.GsonProperties;
-
+import com.app.parker.module.LoggerUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,20 +21,23 @@ public class UserData {
         HashMap<String , Integer> map = new HashMap<>();
         boolean res1 = bookNewPlace(place , time , "A0", userName , false );
         boolean res2 = bookNewPlace(place , time , "A1", userName , false);
-        System.err.println("res1 = " + res1);
-        System.err.println("res2 = " + res2);
+        LoggerUtil.logDebug("res1 = " + res1);
+        LoggerUtil.logDebug("res2 = " + res2);
         if (res1)
             map.put("v0" , 1);
         if (res2)
             map.put("v1" , 1);
+        LoggerUtil.logTrace("status of park" +map);
         return map;
     }
 
     public boolean createNewUser(String name , String password){
         try {
             usersInfo.put(name, password);
+            LoggerUtil.logTrace("createNewUser " + name + " " + password);
             return true;
         }catch (Exception e){
+            LoggerUtil.logError("User creation failed");
             return false;
         }
     }
@@ -51,14 +53,15 @@ public class UserData {
                 for (Data data : dates){
                     long twelveHoursLater = data.getTime() + (12 * 60 * 60 * 1000); // 12 hours in milliseconds
                     if ( data.getPlace().equals(place) && twelveHoursLater >= currentTime && type.equals(data.getType())) {
-                        System.err.println("twelveHoursLater = "+twelveHoursLater);
-                        System.err.println("currentTime = "+currentTime);
+                        LoggerUtil.logWarning("twelveHoursLater = "+twelveHoursLater);
+                        LoggerUtil.logWarning("currentTime = "+currentTime);
                         return false;
                     }
                 }
             }
             if (!userBookedPlace.containsKey(userName)){
                 userBookedPlace.put(userName, new ArrayList<>());
+                LoggerUtil.logDebug("createNewUser " + userName + " " + type);
             }
             if(isApi){
                 ArrayList<Data> arrayList = userBookedPlace.get(userName);
@@ -67,7 +70,7 @@ public class UserData {
             }
             return true;
         } catch (Exception e) {
-            System.err.println("Execption");
+            LoggerUtil.logError("bookNewPlace failed");
             return  false;
         }
     }
@@ -83,17 +86,17 @@ public class UserData {
                     index = i;
             }
             if (index == -1) {
-                System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
+                LoggerUtil.logTrace("userCanEnter"+"userName "+userName +"  place "+place );
                 return false;
             }
             Data data = datas.get(index);
 //            long bookedTime = data.getTime() - (10 * 60 * 1000);;
 //            if ( bookedTime <= currentTime ) return true;
         } catch (Exception exception){
-            System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
+            LoggerUtil.logWarning("userCanEnter"+"userName "+userName +"  place "+place );
             return false;
         }
-        System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
+        LoggerUtil.logDebug("userCanEnter"+"userName "+userName +"  place "+place );
         return true;
     }
 
@@ -138,16 +141,13 @@ public class UserData {
         } catch (Exception exception){
             return "1";
         }
-        System.err.println("userCanExit " +"  userName = " +userName +" place " +place);
+        LoggerUtil.logDebug("userCanExit " +"  userName = " +userName +" place " +place);
         return "1";
     }
 
     public String getAllPlaceData(String place,String v0 , String v1){
-        System.err.println("getAllPlaceData"+"  place = " + place + "   response v0 ="+v0+ "   response v1 ="+v1);
+        LoggerUtil.logTrace("getAllPlaceData"+"  place = " + place + "   response v0 ="+v0+ "   response v1 ="+v1);
         return "{\"v1\":\"" + v0 + "\", \"v2\":\"" + v1 + "\"}";
     }
 
 }
-
-
-

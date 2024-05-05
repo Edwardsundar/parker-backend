@@ -1,13 +1,13 @@
+//main file with all rest endpoints
 package com.app.parker.module;
 
-
-
 import com.app.parker.UserData;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.HashMap;
+import java.util.Objects;
 
 @RestController
 public class HomeResource {
@@ -21,31 +21,37 @@ public class HomeResource {
     @RequestMapping("getparkingareajson")
     public String getParkingAreaJson(@RequestParam String place,@RequestParam String name,@RequestParam String time){
 
+        MDC.put("username:", name);
         String apiUrl = "https://blynk.cloud/external/api/getAll?token=hKRzpe5iAnLwQMQuELweDQTZmGglW0Km";
         String response = restTemplate.getForObject(apiUrl, String.class);
         HashMap<String , Integer> map = userData.getAlreadyBookedData(time , place , name);
-        char[] arr = response.toCharArray();
+        char[] arr = Objects.requireNonNull(response).toCharArray();
         if (map.containsKey("A0"))
             arr[6] = '1';
         if (map.containsKey("A1"))
             arr[13] = '1';
         response = "";
         for (char c : arr) response += c;
-        System.err.println(response);
+        LoggerUtil.info("API REsponse" +response);
+        MDC.clear();
         return response;
     }
 
     @RequestMapping("signup")
     public Boolean createNewUser(@RequestParam String name, @RequestParam String password){
+        MDC.put("username:", name);
         boolean result = userData.createNewUser(name, password);
-        System.err.println("Create New User = "+result);
+        LoggerUtil.info("User creates a new account"+result);
+        MDC.clear();
         return result;
     }
 
     @RequestMapping("signin")
     public Boolean getUserExist(@RequestParam String name, @RequestParam String password){
+        MDC.put("username:", name);
         boolean result = userData.isUserExist(name, password);
-        System.err.println("User is Exist in the table = "+result);
+        LoggerUtil.info("User is login in and verify authenticity = "+result);
+        MDC.clear();
         return result;
     }
 
@@ -58,8 +64,11 @@ public class HomeResource {
     public Boolean bookNewSlot(
             @RequestParam String place, @RequestParam String time, @RequestParam String type, @RequestParam String userName
     ){
+        MDC.put("username:", time);
         boolean result = userData.bookNewPlace(place , time , type , userName , true);
-        System.err.println("new Slot Booked Success fully = "+result);
+        LoggerUtil.info("new Slot Booked Success fully for user"+result);
+        LoggerUtil.info("Parking place occupied?"+result);
+        MDC.clear();
         return result;
     }
 
@@ -68,7 +77,7 @@ public class HomeResource {
             @RequestParam String place, @RequestParam String userName , @RequestParam String type
     ) throws InterruptedException {
         boolean result = userData.userCanEnter(userName , place);
-        System.err.println("user can Enter =  "+result);
+        LoggerUtil.info("Access for entry granted for user "+result);
         if (result) {
             String servoMotorPin = "V2" ;
             String apiUrl = "https://blynk.cloud/external/api/update?token=hKRzpe5iAnLwQMQuELweDQTZmGglW0Km&" + servoMotorPin +"="+1;
@@ -84,26 +93,29 @@ public class HomeResource {
     public String userCanExit(
             @RequestParam String place, @RequestParam String userName
     ){
+        MDC.put("username:", place);
         String result = userData.userCanExit(userName , place);
-        System.err.println("user can Exit =  "+result);
+        LoggerUtil.info("Exit allowed for user "+result);
         return result;
     }
 
     @RequestMapping("usertime")
     public String userTime(
-            @RequestParam String place, @RequestParam String userName
+            @RequestParam String time, @RequestParam String userName
     ){
-        String result = userData.userTime(userName , place);
-        System.err.println("user can Exit =  "+result);
+        MDC.put("username:", time);
+        String result = userData.userTime(userName , time);
+        LoggerUtil.info("user can Exit =  "+result);
+        MDC.clear();
         return result;
     }
 
     @RequestMapping(value = "/updateslot", method = RequestMethod.POST)
     public boolean updateSlot(@RequestParam String servoMotorGateSignal, @RequestParam String servoMotorPin){
-        System.err.println("Before Call");
+        LoggerUtil.info("Before Call");
         String apiUrl = "https://blynk.cloud/external/api/update?token=hKRzpe5iAnLwQMQuELweDQTZmGglW0Km&" + servoMotorPin +"="+servoMotorGateSignal;
         String response = restTemplate.getForObject(apiUrl, String.class);
-        System.err.println("After Call");
+        LoggerUtil.info("After Call");
         return true;
     }
 
