@@ -16,8 +16,12 @@ public class UserData {
         return usersInfo.containsKey(name) && usersInfo.get(name).equals(password);
     }
 
-    public HashMap<String , Integer> getAlreadyBookedData(String time,String place, String userName  ){
-        Long currentTime = Long.parseLong(time);
+    public HashMap<String , Integer> getAlreadyBookedData(String time,String place, String userName  ) {
+        try {
+            Long currentTime = Long.parseLong(time);
+        } catch (NumberFormatException e) {
+            LoggerUtil.logError(("An Error occurred while parsing a string into a number:" + e.getMessage()));
+        }
         HashMap<String , Integer> map = new HashMap<>();
         boolean res1 = bookNewPlace(place , time , "A0", userName , false );
         boolean res2 = bookNewPlace(place , time , "A1", userName , false);
