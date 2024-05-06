@@ -3,7 +3,6 @@ package com.app.parker.module;
 
 import com.app.parker.UserData;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
@@ -12,11 +11,14 @@ import java.util.Objects;
 @RestController
 public class HomeResource {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-    @Autowired
-    private UserData userData;
+    private final UserData userData;
+
+    public HomeResource(RestTemplate restTemplate, UserData userData) {
+        this.restTemplate = restTemplate;
+        this.userData = userData;
+    }
 
     @RequestMapping("getparkingareajson")
     public String getParkingAreaJson(@RequestParam String place,@RequestParam String name,@RequestParam String time){
@@ -32,7 +34,7 @@ public class HomeResource {
             arr[13] = '1';
         response = "";
         for (char c : arr) response += c;
-        LoggerUtil.info("API REsponse" +response);
+        LoggerUtil.info("API Response" +response);
         MDC.clear();
         return response;
     }
