@@ -22,11 +22,11 @@ public class UserData {
         HashMap<String , Integer> map = new HashMap<>();
         boolean res1 = bookNewPlace(place , time , "A0", userName , false );
         boolean res2 = bookNewPlace(place , time , "A1", userName , false);
-        System.err.println("res1 = " + res1);
-        System.err.println("res2 = " + res2);
-        if (res1)
+//        System.err.println("res1 = " + res1);
+//        System.err.println("res2 = " + res2);
+        if (!res1)
             map.put("v0" , 1);
-        if (res2)
+        if (!res2)
             map.put("v1" , 1);
         return map;
     }
@@ -49,10 +49,10 @@ public class UserData {
             for (String user : userBookedPlace.keySet() ){
                 List<Data> dates = userBookedPlace.get(user);
                 for (Data data : dates){
-                    long twelveHoursLater = data.getTime() + (12 * 60 * 60 * 1000); // 12 hours in milliseconds
-                    if ( data.getPlace().equals(place) && twelveHoursLater >= currentTime && type.equals(data.getType())) {
-                        System.err.println("twelveHoursLater = "+twelveHoursLater);
-                        System.err.println("currentTime = "+currentTime);
+                    long twelveHoursLater = data.getTime() + (11 * 60 * 60 * 1000); // 12 hours in milliseconds
+                    if (twelveHoursLater >= currentTime && type.equals(data.getType())) {
+//                        System.err.println("twelveHoursLater = "+twelveHoursLater);
+//                        System.err.println("currentTime = "+currentTime);
                         return false;
                     }
                 }
@@ -67,7 +67,7 @@ public class UserData {
             }
             return true;
         } catch (Exception e) {
-            System.err.println("Execption");
+//            System.err.println("Execption");
             return  false;
         }
     }
@@ -83,17 +83,17 @@ public class UserData {
                     index = i;
             }
             if (index == -1) {
-                System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
+//                System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
                 return false;
             }
             Data data = datas.get(index);
 //            long bookedTime = data.getTime() - (10 * 60 * 1000);;
 //            if ( bookedTime <= currentTime ) return true;
         } catch (Exception exception){
-            System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
+//            System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
             return false;
         }
-        System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
+//        System.err.println("userCanEnter"+"userName "+userName +"  place "+place );
         return true;
     }
 
@@ -138,12 +138,12 @@ public class UserData {
         } catch (Exception exception){
             return "1";
         }
-        System.err.println("userCanExit " +"  userName = " +userName +" place " +place);
+//        System.err.println("userCanExit " +"  userName = " +userName +" place " +place);
         return "1";
     }
 
     public String getAllPlaceData(String place,String v0 , String v1){
-        System.err.println("getAllPlaceData"+"  place = " + place + "   response v0 ="+v0+ "   response v1 ="+v1);
+//        System.err.println("getAllPlaceData"+"  place = " + place + "   response v0 ="+v0+ "   response v1 ="+v1);
         return "{\"v1\":\"" + v0 + "\", \"v2\":\"" + v1 + "\"}";
     }
 

@@ -25,9 +25,9 @@ public class HomeResource {
         String response = restTemplate.getForObject(apiUrl, String.class);
         HashMap<String , Integer> map = userData.getAlreadyBookedData(time , place , name);
         char[] arr = response.toCharArray();
-        if (map.containsKey("A0"))
+        if (map.containsKey("v0"))
             arr[6] = '1';
-        if (map.containsKey("A1"))
+        if (map.containsKey("v1"))
             arr[13] = '1';
         response = "";
         for (char c : arr) response += c;
@@ -38,14 +38,23 @@ public class HomeResource {
     @RequestMapping("signup")
     public Boolean createNewUser(@RequestParam String name, @RequestParam String password){
         boolean result = userData.createNewUser(name, password);
-        System.err.println("Create New User = "+result);
+        if (result){
+            System.err.println("New User Created ");
+        }else  {
+            System.err.println("User is't created");
+        }
+
         return result;
     }
 
     @RequestMapping("signin")
     public Boolean getUserExist(@RequestParam String name, @RequestParam String password){
         boolean result = userData.isUserExist(name, password);
-        System.err.println("User is Exist in the table = "+result);
+        if (result){
+            System.err.println("is valid user");
+        }else {
+            System.err.println("Invalid User");
+        }
         return result;
     }
 
@@ -59,7 +68,11 @@ public class HomeResource {
             @RequestParam String place, @RequestParam String time, @RequestParam String type, @RequestParam String userName
     ){
         boolean result = userData.bookNewPlace(place , time , type , userName , true);
-        System.err.println("new Slot Booked Success fully = "+result);
+        if (result){
+            System.err.println("New Slot is Successfully booked");
+        }else {
+            System.err.println("Failed to book new slot because slot is already booked");
+        }
         return result;
     }
 
@@ -73,9 +86,13 @@ public class HomeResource {
             String servoMotorPin = "V2" ;
             String apiUrl = "https://blynk.cloud/external/api/update?token=hKRzpe5iAnLwQMQuELweDQTZmGglW0Km&" + servoMotorPin +"="+1;
             restTemplate.getForObject(apiUrl, String.class);
+            System.err.println("Gate is opened User can enter");
             Thread.sleep(5000);
+            System.err.println("Gate is closed !! if not entered need to scann the qr again");
             apiUrl = "https://blynk.cloud/external/api/update?token=hKRzpe5iAnLwQMQuELweDQTZmGglW0Km&" + servoMotorPin +"="+0;
             restTemplate.getForObject(apiUrl, String.class);
+        } else {
+            System.err.println("Failed to Enter in to the gate");
         }
         return result;
     }
@@ -85,16 +102,34 @@ public class HomeResource {
             @RequestParam String place, @RequestParam String userName
     ){
         String result = userData.userCanExit(userName , place);
-        System.err.println("user can Exit =  "+result);
+        if (result != null){
+            System.err.println("User can exit the parking after paying the bill");
+        }else {
+            System.err.println("need to scann again for exit");
+        }
         return result;
     }
+
+    @RequestMapping("exit")
+    public void userCanExit() throws InterruptedException {
+        String servoMotorPin = "V3" ;
+        String apiUrl = "https://blynk.cloud/external/api/update?token=hKRzpe5iAnLwQMQuELweDQTZmGglW0Km&" + servoMotorPin +"="+1;
+        restTemplate.getForObject(apiUrl, String.class);
+        System.err.println("Gate is opened User can exit");
+        Thread.sleep(5000);
+        System.err.println("Gate is closed !! if not exit need to scann the qr again");
+        apiUrl = "https://blynk.cloud/external/api/update?token=hKRzpe5iAnLwQMQuELweDQTZmGglW0Km&" + servoMotorPin +"="+0;
+        restTemplate.getForObject(apiUrl, String.class);
+    }
+
+
 
     @RequestMapping("usertime")
     public String userTime(
             @RequestParam String place, @RequestParam String userName
     ){
         String result = userData.userTime(userName , place);
-        System.err.println("user can Exit =  "+result);
+        System.err.println("need to pay this INR to exit = "+result);
         return result;
     }
 
